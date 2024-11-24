@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .permissions import IsOwnerOrReadOnly
+from .paginations import TimelinePagination
 from .serializers import (
     PostSerializer,
     PostDetailSerializer,
@@ -14,8 +15,9 @@ from .utils import get_tokens_for_user
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.prefetch_related("replies")
+    queryset = Post.objects.order_by("-created_at").prefetch_related("replies")
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    pagination_class = TimelinePagination
 
     def get_serializer(self, *args, **kwargs):
         if self.action in ["retrieve", "update", "partial_update"]:

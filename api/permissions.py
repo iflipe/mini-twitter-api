@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
-    """Allow object modification and deletion only to the owner of the object."""
+    """Permite modificação e exclusão apenas para o criador do objeto."""
 
     def has_object_permission(self, request, view, obj):
 
