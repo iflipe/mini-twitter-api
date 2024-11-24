@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from .serializers import PostSerializer, PostDetailSerializer
+from .models import Post
 
-# Create your views here.
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.prefetch_related("replies")
+
+    def get_serializer(self, *args, **kwargs):
+        if self.action in ["retrieve", "update", "partial_update"]:
+            serializer_class = PostDetailSerializer
+        else:
+            serializer_class = PostSerializer
+        kwargs.setdefault("context", self.get_serializer_context())
+        return serializer_class(*args, **kwargs)
