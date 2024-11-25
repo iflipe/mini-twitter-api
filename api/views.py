@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .permissions import IsOwnerOrReadOnly
@@ -26,6 +27,18 @@ class PostViewSet(viewsets.ModelViewSet):
             serializer_class = PostSerializer
         kwargs.setdefault("context", self.get_serializer_context())
         return serializer_class(*args, **kwargs)
+
+    @action(detail=True, methods=["post"])
+    def reply(self, request, pk=None):
+        context = self.get_serializer_context()
+        context["reply_to_id"] = self.kwargs["pk"]
+        serializer = self.get_serializer(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class CreateUserAPIView(generics.CreateAPIView):

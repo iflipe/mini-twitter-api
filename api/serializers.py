@@ -5,21 +5,41 @@ from django.contrib.auth.models import User
 
 
 class PostSerializer(ModelSerializer):
+
     class Meta:
         model = Post
         fields = [
             "id",
             "content",
-            "reply_to",
+            "reply_to_id",
             "created_by",
             "edited",
             "likes",
             "created_at",
         ]
-        read_only_fields = ["likes", "created_at", "created_by", "edited"]
+        read_only_fields = [
+            "likes",
+            "created_at",
+            "created_by",
+            "edited",
+            "reply_to_id",
+        ]
+
+    def validate(self, value):
+        post_id = self.context.get("reply_to_id")
+        if not post_id:
+            return value
+        try:
+            Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            raise serializers.ValidationError("O post não existe.")
+        return value
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
+        pk = self.context.get("reply_to_id")
+        if pk:
+            validated_data["reply_to_id"] = int(pk)
         return Post.objects.create(**validated_data)
 
 
