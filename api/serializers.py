@@ -75,18 +75,52 @@ class PostDetailSerializer(ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class LikePostSerializer(ModelSerializer):
+    replies = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Post
+        fields = [
+            "id",
+            "content",
+            "reply_to",
+            "created_by",
+            "edited",
+            "likes",
+            "created_at",
+            "replies",
+        ]
+        read_only_fields = [
+            "likes",
+            "created_at",
+            "content",
+            "created_by",
+            "replies",
+            "reply_to",
+            "edited",
+        ]
+
+    def update(self, instance, validated_data):
+        if (
+            self.context.get("action") == "like"
+            and self.context["request"].method == "POST"
+        ):
+            instance.liked_by.add(self.context["request"].user)
+        if (
+            self.context.get("action") == "like"
+            and self.context["request"].method == "DELETE"
+        ):
+            instance.liked_by.remove(self.context["request"].user)
+        return instance
+
+
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password"]
+        fields = ["id", "email", "first_name", "last_name", "username", "password"]
         extra_kwargs = {
             "password": {"write_only": True, "style": {"input_type": "password"}}
         }
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data["username"],
-            email=validated_data["email"],
-            password=validated_data["password"],
-        )
-        return user
