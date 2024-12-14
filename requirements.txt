@@ -9,6 +9,7 @@ PyJWT==2.10.0
 python-dotenv==1.0.1
 pytz==2024.2
 PyYAML==6.0.2
+shortuuid==1.0.13
 sqlparse==0.5.2
 tzdata==2024.2
 uritemplate==4.1.1

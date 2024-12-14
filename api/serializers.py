@@ -39,7 +39,7 @@ class PostSerializer(ModelSerializer):
         validated_data["created_by"] = self.context["request"].user
         pk = self.context.get("reply_to_id")
         if pk:
-            validated_data["reply_to_id"] = int(pk)
+            validated_data["reply_to_id"] = str(pk)
         return Post.objects.create(**validated_data)
 
 
