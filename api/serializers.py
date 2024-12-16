@@ -104,6 +104,12 @@ class LikePostSerializer(ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        """
+        Atualiza o post para ser curtido ou descurtido pelo usuário atual.
+        Se a ação do contexto for "like" e o método da requisição for "POST", o usuário atual é adicionado ao campo liked_by do post.
+        Se a ação do contexto for "like" e o método da requisição for "DELETE", o usuário atual é removido do campo liked_by do post.
+        """
+
         if (
             self.context.get("action") == "like"
             and self.context["request"].method == "POST"
@@ -121,6 +127,8 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "first_name", "last_name", "username", "password"]
+
+        # Adiciona estilo para ocultar a senha na versão navegável da API.
         extra_kwargs = {
             "password": {"write_only": True, "style": {"input_type": "password"}}
         }
