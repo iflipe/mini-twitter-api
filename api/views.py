@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -20,15 +22,55 @@ from .models import Post
 from .utils import get_tokens_for_user
 
 
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        operation_description="Lista todos os posts de todos os usuários, exibindo os mais recentes primeiro, com paginação.",
+    ),
+)
+@method_decorator(
+    name="create",
+    decorator=swagger_auto_schema(
+        operation_description="Cria um novo post com o usuário logado.",
+    ),
+)
+@method_decorator(
+    name="retrieve",
+    decorator=swagger_auto_schema(
+        operation_description="Exibe os detalhes de um post específico.",
+    ),
+)
+@method_decorator(
+    name="update",
+    decorator=swagger_auto_schema(
+        operation_description="Atualiza um post específico do usuário logado.",
+    ),
+)
+@method_decorator(
+    name="partial_update",
+    decorator=swagger_auto_schema(
+        operation_description="Atualiza parcialmente um post específico do usuário logado.",
+    ),
+)
+@method_decorator(
+    name="destroy",
+    decorator=swagger_auto_schema(
+        operation_description="Remove um post específico se de autoria do usuário logado.",
+    ),
+)
 class PostViewSet(viewsets.ModelViewSet):
     """
     Viewset que integra os endpoints de CRUD dos posts, bem como as ações extras de responder e curtir posts.
     """
 
+    # Define o queryset para a listagem de posts, ordenando-os por data de criação e pré-carregando as respostas para evitar consultas adicionais
     queryset = Post.objects.order_by("-created_at").prefetch_related("replies")
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    # Define a paginação personalizada para a timeline
     pagination_class = TimelinePagination
 
+    # Define o serializer correto para cada ação
     def get_serializer(self, *args, **kwargs):
         if self.action in ["retrieve", "update", "partial_update"]:
             serializer_class = PostDetailSerializer
@@ -45,7 +87,7 @@ class PostViewSet(viewsets.ModelViewSet):
         Adiciona um post como resposta ao post ao qual a url faz referência usando o usuário logado, levanta uma exceção para o caso de o post referenciado não existir.
         """
         context = self.get_serializer_context()
-        context["reply_to_id"] = self.kwargs["pk"]
+        context["reply_to"] = self.kwargs["pk"]
         serializer = self.get_serializer(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

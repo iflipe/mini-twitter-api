@@ -14,7 +14,11 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Mini-Twitter API",
         default_version="v1",
-        description="Uma API para uma versão simplificada de uma rede social no estilo do Twitter, com autenticação via JWT, com endpoints para registro e login de usuários, e CRUD de posts, com funcionalidades de resposta a posts e a curtidas.",
+        description="""
+        O mini-twitter-api é uma API REST simples que simula algumas funcionalidades básicas do Twitter/X.
+
+        Essa API possui endpoints que permitem ao usuário **criar** e **acessar** sua conta para que possa **ler**, **criar**, **editar**, **curtir** e **deletar** posts.
+        """,
         contact=openapi.Contact(email="foo@bar.com"),
         license=openapi.License(name="Open Source"),
     ),

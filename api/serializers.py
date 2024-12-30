@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 
 class PostSerializer(HyperlinkedModelSerializer):
+    # Retorna o nome do usuário que criou o post
     created_by = serializers.ReadOnlyField(source="created_by.username")
 
     class Meta:
@@ -31,7 +32,10 @@ class PostSerializer(HyperlinkedModelSerializer):
         }
 
     def validate(self, value):
-        post_id = self.context.get("reply_to_id")
+        """
+        Valida se o post ao qual o usuário está respondendo existe.
+        """
+        post_id = self.context.get("reply_to")
         if not post_id:
             return value
         try:
@@ -41,14 +45,18 @@ class PostSerializer(HyperlinkedModelSerializer):
         return value
 
     def create(self, validated_data):
+        """
+        Adiciona o usuário autenticado como criador do post e, se o post for uma resposta, adiciona o post ao qual está respondendo.
+        """
         validated_data["created_by"] = self.context["request"].user
-        pk = self.context.get("reply_to_id")
+        pk = self.context.get("reply_to")
         if pk:
-            validated_data["reply_to_id"] = str(pk)
+            validated_data["reply_to"] = str(pk)
         return Post.objects.create(**validated_data)
 
 
 class PostDetailSerializer(HyperlinkedModelSerializer):
+    # Retorna o nome do usuário que criou o post
     created_by = serializers.ReadOnlyField(source="created_by.username")
     replies = serializers.HyperlinkedRelatedField(
         view_name="post-detail",
@@ -82,11 +90,15 @@ class PostDetailSerializer(HyperlinkedModelSerializer):
         }
 
     def update(self, instance, validated_data):
+        """
+        Atualiza o post e o marca como editado.
+        """
         validated_data["edited"] = True
         return super().update(instance, validated_data)
 
 
 class LikePostSerializer(HyperlinkedModelSerializer):
+    # Retorna o nome do usuário que criou o post
     created_by = serializers.ReadOnlyField(source="created_by.username")
     replies = serializers.HyperlinkedRelatedField(
         view_name="post-detail",

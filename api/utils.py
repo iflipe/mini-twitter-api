@@ -2,6 +2,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def get_tokens_for_user(user):
+    """
+    Retorna um dicionário com os tokens de acesso e refresh para um usuário
+    """
     refresh = RefreshToken.for_user(user)
 
     return {

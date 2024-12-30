@@ -29,7 +29,7 @@ Essa API possui endpoints que permitem ao usuário **criar** e **acessar** sua c
     - Utilize a interface gráfica para testar os endpoints.
     - Para autenticação, insira o token JWT no formato: `Bearer <token>`.
 
-Para mais detalhes, visite a [documentação da API](iflipe.pythonanywhere.com/docs/).
+Para mais detalhes, visite a [documentação da API](https://www.iflipe.pythonanywhere.com/docs/).
 
 ## Dependências
 
@@ -40,6 +40,6 @@ Para mais detalhes, visite a [documentação da API](iflipe.pythonanywhere.com/d
 
 ## Documentação da API
 
-A documentação da API pode ser encontrada [aqui](iflipe.pythonanywhere.com/docs/).
+A documentação da API pode ser encontrada [aqui](https://iflipe.pythonanywhere.com/docs/).
 
 #### Desenvolvido por **[@iflipe](https://github.com/iflipe)**
