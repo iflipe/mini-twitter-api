@@ -3,7 +3,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenBlacklistView,
+)
 from .permissions import IsOwnerOrReadOnly
 from .paginations import TimelinePagination
 from .serializers import (
@@ -105,3 +109,15 @@ class LoginUserAPIView(TokenObtainPairView):
     """
 
     permission_classes = [AllowAny]
+
+
+class TokenRefreshAPIView(TokenRefreshView):
+    """
+    Retorna um novo token de acesso caso o token de atualização seja válido.
+    """
+
+
+class LogoutUserAPIView(TokenBlacklistView):
+    """
+    Invalida o token de atualização do usuário logado.
+    """
