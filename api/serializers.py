@@ -1,17 +1,19 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
 from rest_framework import serializers
 from .models import Post
 from django.contrib.auth.models import User
 
 
-class PostSerializer(ModelSerializer):
+class PostSerializer(HyperlinkedModelSerializer):
+    created_by = serializers.ReadOnlyField(source="created_by.username")
 
     class Meta:
         model = Post
         fields = [
+            "url",
             "id",
             "content",
-            "reply_to_id",
+            "reply_to",
             "created_by",
             "edited",
             "likes",
@@ -22,8 +24,11 @@ class PostSerializer(ModelSerializer):
             "created_at",
             "created_by",
             "edited",
-            "reply_to_id",
+            "reply_to",
         ]
+        extra_kwargs = {
+            "url": {"view_name": "post-detail"},
+        }
 
     def validate(self, value):
         post_id = self.context.get("reply_to_id")
@@ -43,8 +48,10 @@ class PostSerializer(ModelSerializer):
         return Post.objects.create(**validated_data)
 
 
-class PostDetailSerializer(ModelSerializer):
-    replies = serializers.PrimaryKeyRelatedField(
+class PostDetailSerializer(HyperlinkedModelSerializer):
+    created_by = serializers.ReadOnlyField(source="created_by.username")
+    replies = serializers.HyperlinkedRelatedField(
+        view_name="post-detail",
         many=True,
         read_only=True,
     )
@@ -52,6 +59,7 @@ class PostDetailSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = [
+            "url",
             "id",
             "content",
             "reply_to",
@@ -69,14 +77,19 @@ class PostDetailSerializer(ModelSerializer):
             "reply_to",
             "edited",
         ]
+        extra_kwargs = {
+            "url": {"view_name": "post-detail"},
+        }
 
     def update(self, instance, validated_data):
         validated_data["edited"] = True
         return super().update(instance, validated_data)
 
 
-class LikePostSerializer(ModelSerializer):
-    replies = serializers.PrimaryKeyRelatedField(
+class LikePostSerializer(HyperlinkedModelSerializer):
+    created_by = serializers.ReadOnlyField(source="created_by.username")
+    replies = serializers.HyperlinkedRelatedField(
+        view_name="post-detail",
         many=True,
         read_only=True,
     )
@@ -84,6 +97,7 @@ class LikePostSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = [
+            "url",
             "id",
             "content",
             "reply_to",
