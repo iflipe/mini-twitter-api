@@ -87,7 +87,7 @@ class PostViewSet(viewsets.ModelViewSet):
         Adiciona um post como resposta ao post ao qual a url faz referência usando o usuário logado, levanta uma exceção para o caso de o post referenciado não existir.
         """
         context = self.get_serializer_context()
-        context["reply_to"] = self.kwargs["pk"]
+        context["reply_to_id"] = self.kwargs["pk"]
         serializer = self.get_serializer(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

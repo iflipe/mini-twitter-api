@@ -49,9 +49,9 @@ class PostSerializer(HyperlinkedModelSerializer):
         Adiciona o usuário autenticado como criador do post e, se o post for uma resposta, adiciona o post ao qual está respondendo.
         """
         validated_data["created_by"] = self.context["request"].user
-        pk = self.context.get("reply_to")
+        pk = self.context.get("reply_to_id")
         if pk:
-            validated_data["reply_to"] = str(pk)
+            validated_data["reply_to_id"] = str(pk)
         return Post.objects.create(**validated_data)
 
 
