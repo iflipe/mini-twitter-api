@@ -2,6 +2,8 @@ from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializ
 from rest_framework import serializers
 from .models import Post
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 class PostSerializer(HyperlinkedModelSerializer):
@@ -158,3 +160,19 @@ class UserSerializer(ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True, "style": {"input_type": "password"}}
         }
+
+    def create(self, validated_data):
+        user = User(
+            email=validated_data["email"],
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
+            username=validated_data["username"],
+        )
+        user.set_password(validated_data["password"])
+        try:
+            validate_password(validated_data["password"], user=user)
+        except ValidationError as e:
+            raise e
+
+        user.save()
+        return user

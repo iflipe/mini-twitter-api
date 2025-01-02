@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import (
@@ -138,7 +139,13 @@ class CreateUserAPIView(generics.CreateAPIView):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        try:
+            user = serializer.save()
+        except ValidationError as e:
+            return Response(
+                {"detail": e.messages},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         data = serializer.data
         data["tokens"] = get_tokens_for_user(user)
         headers = self.get_success_headers(serializer.data)
