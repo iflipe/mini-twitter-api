@@ -1,4 +1,6 @@
-# mini-twitter-api
+<div style="background-color:#25406b;display:flex;justify-content:center;align-items:center;height:4rem;">
+    <img src="assets/icon.png" alt="Logo pássaro"/ style="margin-right:1.5rem;height:3rem;"><h1 style="border-bottom:none;margin:0">MINI-TWITTER API</h1>
+</div>
 
 ## Sobre o Projeto
 
